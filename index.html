@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suma Vatturi — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --lavender: #c9c0e8;
+    --lavender-light: #e4dffa;
+    --lavender-deep: #9b8ec4;
+    --pink: #f0c4d8;
+    --pink-deep: #e8a0c0;
+    --white: #fffefe;
+    --dark: #1a1624;
+    --text-muted: #6b5e8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--lavender-light);
+    color: var(--dark);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--lavender-deep);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9999;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--lavender-deep);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none; z-index: 9998;
+    opacity: 0.6;
+  }
+
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 24px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(228,223,250,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(4px);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700;
+    letter-spacing: 0.04em; color: var(--dark); cursor: pointer;
+  }
+  .nav-links { display: flex; gap: 40px; }
+  .nav-links a {
+    font-size: 0.82rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); text-decoration: none;
+    position: relative; transition: color 0.2s; cursor: pointer;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -3px; left: 0;
+    width: 0; height: 1.5px; background: var(--lavender-deep); transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--dark); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* ─── HERO ─── */
+  #home-page {
+    background: linear-gradient(135deg, #e4dffa 0%, #d9d0f2 40%, #ead3ee 100%);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .hero-bg-circle {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-bg-circle.c1 { width: 600px; height: 600px; top: -150px; right: -100px; }
+  .hero-bg-circle.c2 { width: 400px; height: 400px; bottom: -80px; left: -60px; }
+
+  .hero {
+    flex: 1;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 140px 40px 100px;
+    position: relative;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 500;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 28px;
+    opacity: 0; animation: slideUp 0.7s 0.2s forwards;
+  }
+
+  /* Clean single-style outlined name */
+  .hero-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4.5rem, 13vw, 10rem);
+    font-weight: 900;
+    line-height: 0.9;
+    color: transparent;
+    -webkit-text-stroke: 2.5px var(--dark);
+    opacity: 0; animation: slideUp 0.8s 0.4s forwards;
+    letter-spacing: -0.02em;
+    user-select: none;
+    position: relative;
+  }
+  /* Second line solid fill for contrast */
+  .hero-name .line2 {
+    display: block;
+    color: var(--dark);
+    -webkit-text-stroke: 0;
+    margin-top: 4px;
+  }
+
+  .hero-sub {
+    display: flex; gap: 18px; align-items: center;
+    margin-top: 36px;
+    opacity: 0; animation: slideUp 0.7s 0.7s forwards;
+  }
+  .hero-sub span { font-size: 0.88rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0.06em; }
+  .hero-sub .dot { width: 4px; height: 4px; background: var(--lavender-deep); border-radius: 50%; flex-shrink: 0; }
+
+  .hero-cta {
+    display: flex; gap: 16px; margin-top: 52px;
+    opacity: 0; animation: slideUp 0.7s 0.9s forwards;
+  }
+
+  .btn {
+    padding: 14px 34px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all 0.3s cubic-bezier(.25,.46,.45,.94);
+  }
+  .btn-primary { background: var(--dark); color: var(--white); border-radius: 60px; }
+  .btn-primary:hover { background: var(--lavender-deep); transform: translateY(-2px); }
+  .btn-outline { background: transparent; color: var(--dark); border: 1.5px solid var(--dark); border-radius: 60px; }
+  .btn-outline:hover { background: var(--dark); color: var(--white); transform: translateY(-2px); }
+
+  /* ─── WORK SECTION ─── */
+  .work-section {
+    padding: 120px 60px;
+    background: var(--white);
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700; line-height: 1.1;
+    color: var(--dark); margin-bottom: 64px;
+  }
+
+  .project-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .project-card {
+    cursor: pointer;
+    border-radius: 24px; overflow: hidden;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(.25,.46,.45,.94), box-shadow 0.4s;
+  }
+  .project-card:hover { transform: translateY(-10px) scale(1.01); box-shadow: 0 30px 60px rgba(155,142,196,0.3); }
+  .project-card:hover .card-overlay { opacity: 1; }
+  .project-card:hover .card-arrow { transform: translateX(6px); }
+
+  /* Card with image top, content bottom */
+  .card-image-area {
+    width: 100%; aspect-ratio: 4/3;
+    overflow: hidden; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card-image-area.pm-bg { background: linear-gradient(160deg, #f9d0e4 0%, #eab8d4 100%); }
+  .card-image-area.ai-bg { background: linear-gradient(160deg, #d0dcf9 0%, #b8c8ee 100%); }
+  .card-image-area.tech-bg { background: linear-gradient(160deg, #c8f0e0 0%, #9fdcbe 100%); }
+
+  .card-image-area svg { width: 75%; height: 75%; }
+
+  .card-body {
+    padding: 28px 28px 32px;
+    background: var(--white);
+    border-top: 1px solid rgba(155,142,196,0.12);
+  }
+  .card-tag {
+    display: inline-block;
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--lavender-deep);
+    margin-bottom: 10px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: var(--dark); line-height: 1.2;
+  }
+  .card-arrow {
+    display: inline-block; margin-top: 14px;
+    font-size: 1rem; color: var(--lavender-deep);
+    transition: transform 0.3s;
+  }
+  .card-overlay {
+    position: absolute; inset: 0;
+    background: rgba(155,142,196,0.06);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  /* ─── ABOUT SECTION ─── */
+  .about-section {
+    padding: 120px 60px;
+    background: linear-gradient(135deg, #e4dffa 0%, #ead3ee 100%);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+
+  .about-visual { position: relative; display: flex; justify-content: center; }
+  .about-img-frame {
+    width: 360px; height: 440px;
+    background: linear-gradient(160deg, var(--pink) 0%, var(--lavender) 100%);
+    border-radius: 200px 200px 160px 160px;
+    position: relative; overflow: hidden;
+    box-shadow: 20px 20px 60px rgba(155,142,196,0.35);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .about-img-placeholder {
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem; color: rgba(255,255,255,0.45);
+  }
+  .about-badge {
+    position: absolute; bottom: 20px; right: -20px;
+    background: var(--white); padding: 16px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(155,142,196,0.25);
+  }
+  .about-badge-num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--dark); }
+  .about-badge-label { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.08em; }
+
+  .about-content .section-title { margin-bottom: 28px; font-size: 2.6rem; }
+  .about-body {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.22rem; line-height: 1.85;
+    color: #3d3050; margin-bottom: 40px;
+  }
+
+  /* ─── CONTACT SECTION ─── */
+  .contact-section {
+    padding: 120px 60px;
+    background: var(--dark);
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: center;
+  }
+  .contact-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5vw, 4rem);
+    font-weight: 900; line-height: 1.05; color: var(--white);
+  }
+  .contact-heading em { color: var(--lavender); font-style: italic; }
+  .contact-links { display: flex; flex-direction: column; gap: 28px; }
+  .contact-item { display: flex; flex-direction: column; gap: 6px; }
+  .contact-label {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--lavender-deep);
+  }
+  .contact-value {
+    font-size: 1.05rem; color: rgba(255,255,255,0.85);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .contact-value:hover { color: var(--lavender); }
+  .contact-divider { width: 40px; height: 1px; background: rgba(255,255,255,0.15); margin: 4px 0; }
+
+  .footer-bar {
+    padding: 24px 60px;
+    background: var(--dark);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+
+  /* ─── PROJECT PAGES ─── */
+  .project-page { min-height: 100vh; padding-top: 100px; }
+  .page-hero { padding: 80px 60px 60px; position: relative; }
+  .page-hero.pm-hero { background: linear-gradient(135deg, #fce4ef 0%, #f5c6e0 100%); }
+  .page-hero.ai-hero { background: linear-gradient(135deg, #dde8fc 0%, #c8d8f5 100%); }
+  .page-hero.tech-hero { background: linear-gradient(135deg, #d8f5e8 0%, #b8e8d0 100%); }
+
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em;
+    color: var(--text-muted); cursor: pointer;
+    margin-bottom: 40px; transition: gap 0.2s;
+    background: none; border: none;
+  }
+  .back-btn:hover { gap: 12px; color: var(--dark); }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 900; line-height: 0.95; color: var(--dark);
+  }
+  .page-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem; font-style: italic;
+    color: var(--text-muted); margin-top: 20px; max-width: 600px;
+  }
+
+  .projects-list {
+    padding: 60px;
+    display: grid; gap: 28px;
+    background: var(--white);
+  }
+
+  .proj-item {
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 32px; align-items: start;
+    padding: 40px; border-radius: 20px;
+    border: 1px solid rgba(155,142,196,0.15);
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+  .proj-item:hover {
+    border-color: rgba(155,142,196,0.4);
+    box-shadow: 0 12px 40px rgba(155,142,196,0.12);
+    transform: translateY(-2px);
+  }
+  .proj-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 400; font-style: italic;
+    color: var(--lavender-deep); opacity: 0.6; padding-top: 4px;
+  }
+  .proj-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--dark); margin-bottom: 10px;
+  }
+  .proj-desc {
+    font-size: 0.92rem; line-height: 1.7;
+    color: var(--text-muted); margin-bottom: 16px; max-width: 560px;
+  }
+  .proj-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .proj-tag {
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+    padding: 5px 14px; border-radius: 30px;
+    border: 1px solid rgba(155,142,196,0.3); color: var(--text-muted);
+  }
+  .proj-status {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 6px 16px; border-radius: 30px;
+    white-space: nowrap; margin-top: 4px;
+  }
+  .status-done { background: #e8f5e9; color: #4caf50; }
+  .status-progress { background: #fff8e1; color: #f59f00; }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 28px; }
+    .work-section, .about-section, .contact-section,
+    .page-hero, .projects-list { padding: 60px 28px; }
+    .project-grid { grid-template-columns: 1fr; gap: 18px; }
+    .about-section { grid-template-columns: 1fr; }
+    .about-visual { display: none; }
+    .contact-section { grid-template-columns: 1fr; }
+    .proj-item { grid-template-columns: 1fr; }
+    .proj-num { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">SV</div>
+  <div class="nav-links">
+    <a onclick="showPage('home'); scrollTo('work')">Work</a>
+    <a onclick="showPage('home'); scrollTo('about')">About</a>
+    <a onclick="showPage('home'); scrollTo('contact')">Contact</a>
+  </div>
+</nav>
+
+<!-- ═══ HOME PAGE ═══ -->
+<div id="home-page" class="page active">
+
+  <section class="hero">
+    <div class="hero-bg-circle c1"></div>
+    <div class="hero-bg-circle c2"></div>
+    <p class="hero-tag">Hello, I am</p>
+    <h1 class="hero-name">
+      SUMA<span class="line2">VATTURI</span>
+    </h1>
+    <div class="hero-sub">
+      <span>CS Graduate Student</span>
+      <div class="dot"></div>
+      <span>Former QA Engineer</span>
+      <div class="dot"></div>
+      <span>PM Enthusiast</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn btn-primary" onclick="scrollTo('work')">View My Work</button>
+      <button class="btn btn-outline" onclick="scrollTo('contact')">Get in Touch</button>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="work-section" id="work">
+    <h2 class="section-title">Things I've<br><em style="font-style:italic;">been building</em></h2>
+    <div class="project-grid">
+
+      <!-- PM Card -->
+      <div class="project-card" onclick="showPage('pm')">
+        <div class="card-image-area pm-bg">
+          <svg viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Roadmap / strategy illustration -->
+            <rect x="20" y="70" width="200" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+            <circle cx="60" cy="73" r="20" fill="rgba(255,255,255,0.5)"/>
+            <circle cx="120" cy="73" r="20" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="180" cy="73" r="20" fill="rgba(255,255,255,0.3)"/>
+            <text x="60" y="78" text-anchor="middle" font-size="13" fill="rgba(100,60,80,0.8)" font-family="serif">1</text>
+            <text x="120" y="78" text-anchor="middle" font-size="13" fill="rgba(100,60,80,0.8)" font-family="serif">2</text>
+            <text x="180" y="78" text-anchor="middle" font-size="13" fill="rgba(100,60,80,0.8)" font-family="serif">3</text>
+            <rect x="30" y="110" width="70" height="10" rx="5" fill="rgba(255,255,255,0.4)"/>
+            <rect x="30" y="126" width="50" height="10" rx="5" fill="rgba(255,255,255,0.25)"/>
+            <rect x="95" y="110" width="55" height="10" rx="5" fill="rgba(255,255,255,0.4)"/>
+            <rect x="95" y="126" width="75" height="10" rx="5" fill="rgba(255,255,255,0.25)"/>
+            <!-- Star accent -->
+            <text x="195" y="40" font-size="28" fill="rgba(255,255,255,0.5)">✦</text>
+            <text x="25" y="50" font-size="16" fill="rgba(255,255,255,0.3)">✦</text>
+            <!-- User icon -->
+            <circle cx="120" cy="32" r="14" fill="rgba(255,255,255,0.4)"/>
+            <path d="M104 55 Q120 47 136 55" stroke="rgba(255,255,255,0.4)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Strategy &amp; Design</div>
+          <div class="card-title">Product Management</div>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="card-overlay"></div>
+      </div>
+
+      <!-- AI Card -->
+      <div class="project-card" onclick="showPage('ai')">
+        <div class="card-image-area ai-bg">
+          <svg viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Neural net illustration -->
+            <!-- Layer 1 nodes -->
+            <circle cx="40" cy="50" r="11" fill="rgba(255,255,255,0.55)"/>
+            <circle cx="40" cy="90" r="11" fill="rgba(255,255,255,0.55)"/>
+            <circle cx="40" cy="130" r="11" fill="rgba(255,255,255,0.55)"/>
+            <!-- Layer 2 nodes -->
+            <circle cx="100" cy="35" r="11" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="100" cy="70" r="11" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="100" cy="105" r="11" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="100" cy="140" r="11" fill="rgba(255,255,255,0.45)"/>
+            <!-- Layer 3 nodes -->
+            <circle cx="160" cy="50" r="11" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="160" cy="90" r="11" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="160" cy="130" r="11" fill="rgba(255,255,255,0.45)"/>
+            <!-- Output node -->
+            <circle cx="215" cy="90" r="14" fill="rgba(255,255,255,0.6)"/>
+            <!-- Connections L1->L2 -->
+            <line x1="51" y1="50" x2="89" y2="35" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+            <line x1="51" y1="50" x2="89" y2="70" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+            <line x1="51" y1="50" x2="89" y2="105" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <line x1="51" y1="90" x2="89" y2="35" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <line x1="51" y1="90" x2="89" y2="70" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
+            <line x1="51" y1="90" x2="89" y2="105" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
+            <line x1="51" y1="90" x2="89" y2="140" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <line x1="51" y1="130" x2="89" y2="105" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+            <line x1="51" y1="130" x2="89" y2="140" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
+            <!-- Connections L2->L3 -->
+            <line x1="111" y1="35" x2="149" y2="50" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+            <line x1="111" y1="70" x2="149" y2="50" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <line x1="111" y1="70" x2="149" y2="90" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
+            <line x1="111" y1="105" x2="149" y2="90" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+            <line x1="111" y1="105" x2="149" y2="130" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <line x1="111" y1="140" x2="149" y2="130" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
+            <!-- L3->Output -->
+            <line x1="171" y1="50" x2="201" y2="90" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <line x1="171" y1="90" x2="201" y2="90" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+            <line x1="171" y1="130" x2="201" y2="90" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <!-- Spark -->
+            <text x="208" y="95" text-anchor="middle" font-size="12" fill="rgba(80,100,180,0.7)">✦</text>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">LLMs · Deep Learning · AI Systems</div>
+          <div class="card-title">Artificial Intelligence</div>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="card-overlay"></div>
+      </div>
+
+      <!-- Tech Card -->
+      <div class="project-card" onclick="showPage('tech')">
+        <div class="card-image-area tech-bg">
+          <svg viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Code editor illustration -->
+            <rect x="20" y="20" width="200" height="145" rx="12" fill="rgba(255,255,255,0.35)"/>
+            <!-- Title bar -->
+            <rect x="20" y="20" width="200" height="28" rx="12" fill="rgba(255,255,255,0.45)"/>
+            <rect x="20" y="36" width="200" height="12" rx="0" fill="rgba(255,255,255,0.45)"/>
+            <circle cx="38" cy="34" r="5" fill="rgba(240,140,140,0.7)"/>
+            <circle cx="54" cy="34" r="5" fill="rgba(240,210,100,0.7)"/>
+            <circle cx="70" cy="34" r="5" fill="rgba(120,210,140,0.7)"/>
+            <!-- Code lines -->
+            <rect x="36" y="62" width="30" height="7" rx="3.5" fill="rgba(100,150,240,0.5)"/>
+            <rect x="72" y="62" width="55" height="7" rx="3.5" fill="rgba(255,255,255,0.5)"/>
+            <rect x="36" y="78" width="18" height="7" rx="3.5" fill="rgba(180,120,240,0.5)"/>
+            <rect x="60" y="78" width="70" height="7" rx="3.5" fill="rgba(255,255,255,0.4)"/>
+            <rect x="46" y="94" width="85" height="7" rx="3.5" fill="rgba(255,255,255,0.35)"/>
+            <rect x="46" y="110" width="60" height="7" rx="3.5" fill="rgba(120,210,140,0.5)"/>
+            <rect x="112" y="110" width="30" height="7" rx="3.5" fill="rgba(255,255,255,0.35)"/>
+            <rect x="36" y="126" width="40" height="7" rx="3.5" fill="rgba(180,120,240,0.5)"/>
+            <rect x="36" y="142" width="100" height="7" rx="3.5" fill="rgba(255,255,255,0.25)"/>
+            <!-- Cursor blink -->
+            <rect x="148" y="142" width="3" height="7" rx="1.5" fill="rgba(255,255,255,0.8)"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-tag">Engineering</div>
+          <div class="card-title">Tech</div>
+          <div class="card-arrow">→</div>
+        </div>
+        <div class="card-overlay"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about-section" id="about">
+    <div class="about-visual">
+      <div class="about-img-frame">
+        <div class="about-img-placeholder">✦</div>
+      </div>
+      <div class="about-badge">
+        <div class="about-badge-num">3+</div>
+        <div class="about-badge-label">Years as QA Engineer</div>
+      </div>
+    </div>
+    <div class="about-content">
+      <h2 class="section-title">Where curiosity<br>meets <em style="font-style:italic;">craft</em></h2>
+      <p class="about-body">
+        I'm a CS grad student at the University of South Florida, with three years under my belt as a Senior QA Engineer — which basically means spotting bugs and overanalyzing apps is second nature to me.<br><br>
+        Somewhere along the way, I realized I cared more about <em>understanding products and user behavior</em> than just testing features. That curiosity pulled me toward Product Management. I love working on AI-powered and full-stack projects, asking too many questions in meetings, and turning half-baked ideas into something genuinely useful.<br><br>
+        Outside of tech: food places, unrealistic to-do lists, and online shopping "just for time pass."
+      </p>
+      <button class="btn btn-primary" onclick="scrollTo('contact')">Let's Talk →</button>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact-section" id="contact">
+    <div>
+      <h2 class="contact-heading">Let's work<br><em>together.</em></h2>
+      <p style="color:rgba(255,255,255,0.45); margin-top:20px; font-size:0.95rem; line-height:1.7; max-width:380px;">
+        Currently looking for opportunities where I can combine my technical background with product thinking. Open to PM, APM, and software roles.
+      </p>
+    </div>
+    <div class="contact-links">
+      <div class="contact-item">
+        <span class="contact-label">Email</span>
+        <a href="mailto:sumavatturi2@gmail.com" class="contact-value">sumavatturi2@gmail.com</a>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <span class="contact-label">Phone</span>
+        <a href="tel:+18138940317" class="contact-value">+1 813-894-0317</a>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <span class="contact-label">LinkedIn</span>
+        <a href="https://linkedin.com/in/sumavatturi/" target="_blank" class="contact-value">linkedin.com/in/sumavatturi</a>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <span class="contact-label">Location</span>
+        <span class="contact-value">Tampa, FL · Open to Remote</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-bar">
+    <span class="footer-copy">© 2025 Suma Vatturi. Crafted with intention.</span>
+    <span class="footer-copy">USF · Computer Science</span>
+  </div>
+
+</div><!-- /home-page -->
+
+<!-- ═══ PM PAGE ═══ -->
+<div id="pm-page" class="page">
+  <div class="project-page">
+    <div class="page-hero pm-hero">
+      <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+      <h1 class="page-title">Product<br>Management</h1>
+      <p class="page-subtitle">Strategy, user research, roadmaps, and shaping products people love.</p>
+    </div>
+    <div class="projects-list">
+      <div class="proj-item">
+        <div class="proj-num">01</div>
+        <div class="proj-info">
+          <div class="proj-name">Campus Connect — App Redesign</div>
+          <div class="proj-desc">Led end-to-end product discovery for a USF student engagement platform. Conducted 20+ user interviews, synthesized pain points, and built a feature roadmap that reduced onboarding friction by 35%.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">User Research</span>
+            <span class="proj-tag">Figma</span>
+            <span class="proj-tag">Roadmapping</span>
+            <span class="proj-tag">A/B Testing</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">02</div>
+        <div class="proj-info">
+          <div class="proj-name">Grocery AI — Feature Spec</div>
+          <div class="proj-desc">Wrote a detailed PRD for an AI-powered grocery list feature that predicts what users need based on their purchase history. Defined success metrics, edge cases, and a phased launch plan.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">PRD Writing</span>
+            <span class="proj-tag">AI Features</span>
+            <span class="proj-tag">Go-to-Market</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">03</div>
+        <div class="proj-info">
+          <div class="proj-name">Competitive Analysis: Note-Taking Apps</div>
+          <div class="proj-desc">Deep-dive competitive teardown of Notion, Obsidian, and Bear — mapping feature gaps, positioning opportunities, and potential white-space for a student-focused entrant.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">Competitive Analysis</span>
+            <span class="proj-tag">Market Research</span>
+            <span class="proj-tag">Positioning</span>
+          </div>
+        </div>
+        <span class="proj-status status-progress">In Progress</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AI PAGE ═══ -->
+<div id="ai-page" class="page">
+  <div class="project-page">
+    <div class="page-hero ai-hero">
+      <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+      <h1 class="page-title">Artificial<br>Intelligence</h1>
+      <p class="page-subtitle">LLMs, deep learning, computer vision — building intelligent systems end to end.</p>
+    </div>
+    <div class="projects-list">
+      <div class="proj-item">
+        <div class="proj-num">01</div>
+        <div class="proj-info">
+          <div class="proj-name">Sentiment Analysis — Review Classifier</div>
+          <div class="proj-desc">Fine-tuned a BERT model to classify product reviews across 5 sentiment categories. Achieved 91% accuracy on the test set. Deployed as a REST API with a lightweight React dashboard.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">NLP</span>
+            <span class="proj-tag">PyTorch</span>
+            <span class="proj-tag">BERT</span>
+            <span class="proj-tag">FastAPI</span>
+            <span class="proj-tag">React</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">02</div>
+        <div class="proj-info">
+          <div class="proj-name">Smart Resume Screener</div>
+          <div class="proj-desc">An LLM-powered tool that parses resumes and job descriptions, scores fit, and highlights gaps. Built with OpenAI's API, LangChain, and Streamlit. Used by 50+ students during campus pilot.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">LLM</span>
+            <span class="proj-tag">LangChain</span>
+            <span class="proj-tag">OpenAI API</span>
+            <span class="proj-tag">Streamlit</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">03</div>
+        <div class="proj-info">
+          <div class="proj-name">Multimodal Study Assistant</div>
+          <div class="proj-desc">RAG-based assistant that ingests lecture slides, PDFs, and handwritten notes to answer student questions in context. Experimenting with vision-language models for multimodal understanding.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">RAG</span>
+            <span class="proj-tag">Vision-Language</span>
+            <span class="proj-tag">Vector DB</span>
+            <span class="proj-tag">Deep Learning</span>
+          </div>
+        </div>
+        <span class="proj-status status-progress">In Progress</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TECH PAGE ═══ -->
+<div id="tech-page" class="page">
+  <div class="project-page">
+    <div class="page-hero tech-hero">
+      <button class="back-btn" onclick="showPage('home')">← Back to Home</button>
+      <h1 class="page-title">Tech</h1>
+      <p class="page-subtitle">Full-stack apps, automation pipelines, and developer tooling.</p>
+    </div>
+    <div class="projects-list">
+      <div class="proj-item">
+        <div class="proj-num">01</div>
+        <div class="proj-info">
+          <div class="proj-name">BugTrack — QA Dashboard</div>
+          <div class="proj-desc">A full-stack bug tracking tool built to streamline defect reporting across teams. Features real-time filtering, severity tagging, and sprint views. Built with React, Node.js, and PostgreSQL.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">React</span>
+            <span class="proj-tag">Node.js</span>
+            <span class="proj-tag">PostgreSQL</span>
+            <span class="proj-tag">REST API</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">02</div>
+        <div class="proj-info">
+          <div class="proj-name">Automated Test Suite — E-Commerce Platform</div>
+          <div class="proj-desc">End-to-end Selenium + Pytest automation framework covering 200+ test cases for a production e-commerce site, cutting manual regression time from 3 days to 4 hours.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">Selenium</span>
+            <span class="proj-tag">Pytest</span>
+            <span class="proj-tag">CI/CD</span>
+            <span class="proj-tag">GitHub Actions</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+      <div class="proj-item">
+        <div class="proj-num">03</div>
+        <div class="proj-info">
+          <div class="proj-name">Portfolio Website</div>
+          <div class="proj-desc">You're looking at it. Designed and built from scratch — responsive, animated, entirely in vanilla HTML/CSS/JS. No frameworks, no templates. Just craft and too many late nights.</div>
+          <div class="proj-tags">
+            <span class="proj-tag">HTML/CSS</span>
+            <span class="proj-tag">JavaScript</span>
+            <span class="proj-tag">UI Design</span>
+            <span class="proj-tag">Animation</span>
+          </div>
+        </div>
+        <span class="proj-status status-done">Completed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Custom Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx-6}px,${my-6}px)`;
+  });
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx-18}px,${ry-18}px)`;
+    requestAnimationFrame(animRing);
+  })();
+
+  // Page Router
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id + '-page').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function scrollTo(id) {
+    setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }, 60);
+  }
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.proj-item, .project-card, .contact-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(22px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    obs.observe(el);
+  });
+</script>
+</body>
+</html>
